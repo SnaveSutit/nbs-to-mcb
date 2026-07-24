@@ -12,10 +12,12 @@
 		// Module resolution
 		"moduleResolution": "Node10",
 
-		// Build output
+		// Build output - bun build produces the runtime JS bundle, tsc only
+		// emits type declarations so the two don't clobber each other.
 		"rootDir": "src",
 		"outDir": "dist",
 		"declaration": true,
+		"emitDeclarationOnly": true,
 		"noEmit": false,
 
 		// Best practices

@@ -1,4 +1,5 @@
-import type { Note } from '@nbsjs/core'
+import type { Instrument, Note } from '@nbsjs/core'
+import { slugify } from './nbsConfig'
 
 /**
  * Maps NBS instrument IDs to their vanilla Minecraft note block sound event.
@@ -32,8 +33,29 @@ const INSTRUMENT_SOUNDS: Readonly<Record<number, string>> = {
 
 const DEFAULT_SOUND = 'minecraft:block.note_block.harp'
 
-export function soundForInstrument(instrumentId: number): string {
-	return INSTRUMENT_SOUNDS[instrumentId] ?? DEFAULT_SOUND
+/** Matches a vanilla sound event id, e.g. `entity.experience_orb.pickup`. */
+const VANILLA_SOUND_ID = /^[a-z0-9_]+(\.[a-z0-9_]+)+$/
+
+/**
+ * Sound event for a note's instrument. Built-ins map to their vanilla note
+ * block sound.
+ *
+ * Custom instruments are commonly added in Note Block Studio by importing a
+ * vanilla sound and naming the instrument after its sound event id (e.g.
+ * `entity.firework.blast_far`) - when the name looks like one, it's used
+ * directly as `minecraft:<name>`. Otherwise custom sounds map to `nbs:custom/<name>`.
+ */
+export function soundForInstrument(instrumentId: number, instrument: Instrument): string {
+	if (instrument.isBuiltIn) {
+		return INSTRUMENT_SOUNDS[instrumentId] ?? DEFAULT_SOUND
+	}
+
+	if (instrument.name && VANILLA_SOUND_ID.test(instrument.name)) {
+		return `minecraft:${instrument.name}`
+	}
+
+	const name = instrument.name || instrument.soundFile || `instrument_${instrumentId}`
+	return `nbs:custom/${slugify(name)}`
 }
 
 export function clamp(v: number, min: number, max: number): number {
@@ -45,14 +67,18 @@ export function round(v: number, decimals: number): number {
 	return Math.round(v * f) / f
 }
 
-/** Converts an NBS note key + fine pitch into a `/playsound` pitch multiplier. */
-export function pitchOf(note: Note): number {
+/**
+ * Converts an NBS note key + fine pitch into a `/playsound` pitch multiplier,
+ * relative to the instrument's own reference key rather than assuming 45
+ * (F#4) - built-ins default to 45 too, but a custom instrument's sample may
+ * be tuned to a different natural pitch.
+ */
+export function pitchOf(note: Note, instrument: Instrument): number {
 	const key = note.key ?? 45
 	if (key < 0 || key > 87) {
 		throw new Error(`Invalid note key: ${key}`)
 	}
 
-	// Key 45 (F#4) is vanilla note block pitch 0, and each key is a semitone.
-	const semitones = key - 45 + (note.pitch ?? 0) / 100
+	const semitones = key - (instrument.key ?? 45) + (note.pitch ?? 0) / 100
 	return round(clamp(2 ** (semitones / 12), 0.5, 2), 4)
 }

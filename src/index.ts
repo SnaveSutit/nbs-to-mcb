@@ -25,7 +25,7 @@ interface MCBPluginBuild {
 
 const SONGS_DIR = './src'
 
-export function mcbPlugin(build: MCBPluginBuild) {
+export function nbsToMcb(build: MCBPluginBuild) {
 	build.events.onPostBuild.subscribe(result => {
 		if (!result.success) return
 
@@ -40,7 +40,7 @@ export function mcbPlugin(build: MCBPluginBuild) {
 		recordInFsCache(writtenFiles)
 	})
 }
-export default mcbPlugin
+export default nbsToMcb
 
 function compileNBSFile(nbsFile: NBSFile, writtenFiles: GeneratedFiles): string | undefined {
 	const { namespace, songId } = resolveLocation(nbsFile.path, SONGS_DIR)

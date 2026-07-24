@@ -37,11 +37,13 @@ export function buildTimeline(song: Song, config: NBSConfig): Timeline {
 				clamp(((note.velocity ?? 100) / 100) * layerVolume * config.volume, 0, 1),
 				4
 			)
+			// Falls back to the built-in harp for a note referencing an instrument id that doesn't exist.
+			const instrument = song.instruments.all[note.instrument] ?? song.instruments.all[0]!
 
 			const event: NoteEvent = {
-				soundId: soundForInstrument(note.instrument),
+				soundId: soundForInstrument(note.instrument, instrument),
 				volume,
-				pitch: pitchOf(note),
+				pitch: pitchOf(note, instrument),
 			}
 
 			const existing = eventsByGameTick.get(gameTick)

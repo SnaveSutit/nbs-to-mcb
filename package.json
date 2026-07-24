@@ -10,7 +10,7 @@
 	],
 	"scripts": {
 		"dev": "tsc --watch",
-		"build": "tsc && cp package.dist.json dist/package.json"
+		"build": "bun build src/index.ts --outfile=dist/index.js --target=node --format=cjs && tsc && cp package.dist.json dist/package.json"
 	},
 	"devDependencies": {
 		"@nbsjs/core": "^6.1.0",
