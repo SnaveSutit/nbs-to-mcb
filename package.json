@@ -1,0 +1,21 @@
+{
+	"name": "nbs-to-mcb",
+	"module": "index.ts",
+	"type": "module",
+	"private": true,
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"dev": "tsc --watch",
+		"build": "tsc && cp package.dist.json dist/package.json"
+	},
+	"devDependencies": {
+		"@nbsjs/core": "^6.1.0",
+		"@types/bun": "latest",
+		"@types/node": "^26.1.1",
+		"typescript": "^5"
+	}
+}

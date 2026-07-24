@@ -1,0 +1,18 @@
+function play {
+	scoreboard players set @s nbs.step 0
+}
+
+function stop {
+	scoreboard players set @s nbs.step -1
+}
+
+function tick minecraft:tick {
+	execute as @a[scores={nbs.step=0..}] at @s run function ./tick_player
+}
+
+function tick_player {
+	execute store result storage nbs:playback step run scoreboard players get @s nbs.step
+	block run_step { with storage nbs:playback {}
+		$function ./steps/$(step)
+	}
+}
