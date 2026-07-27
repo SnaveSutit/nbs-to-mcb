@@ -1,4 +1,4 @@
-const { nbsToMcb } = require('../../dist/index.js')
+const { nbsToMcb } = require('../../dist/nbs-to-mcb.js')
 
 module.exports = {
 	libDir: null, // default: "null", determine where mcb looks for libraries, default is the bundled install location
